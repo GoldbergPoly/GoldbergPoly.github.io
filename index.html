@@ -211,6 +211,130 @@
             textHeight += lineHeight;
         }
 
+        context.fillStyle = "#ffffff";
+        if (pageSize == 'a5' && freq > 3 && orientation == 'p')
+        {
+            var imgData = canvas.toDataURL("image/jpeg", 1.0);
+            pdf.addImage(imgData, 'JPEG', (canvas.width - lastX) * 3 / 8, (canvas.height - lastY) * 3 / 8);
+            pdf.addPage()
+            context.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        context.translate(canvas.width/2,canvas.height/2); 
+        const lineLength = 25;
+        context.lineWidth = 1;
+        context.strokeStyle = '#000000';
+
+        let lables = []
+        const centre = shapes.faces.findIndex((s) => s.quantity == 20)
+        lables["0,0"] = "#" + (centre + 1)
+        const direction = [[0,1],[1,0],[1,-1],[0,-1],[-1,0],[-1,1]]
+
+        for (var i = 0; i < direction.length; i++)
+        {
+            var currentIndex = [0,0]
+            var currentHex = centre
+            var currentDirection = i
+            var started = false;
+            var hexSize = 0;
+
+            var across = 0
+
+            while(shapes.faces[currentHex].edges.length == 6 && !(started && currentHex == centre))
+            {
+                hexSize++;
+                started = true;
+                
+                var newMatch = findMatch(currentHex, (currentDirection + 3)%6, shapes)
+                currentHex = newMatch[0]
+                currentDirection = newMatch[1]
+
+                currentIndex[0]+= direction[i][0]
+                currentIndex[1]+= direction[i][1]
+
+                lables[(currentIndex[0] + "," + currentIndex[1])] = '#' + (currentHex + 1)
+
+                let innerDirection = i;
+                let innerIndex = [currentIndex[0],currentIndex[1]]
+                let innerHex = currentHex
+                for (j=0; j < across; j++)
+                {
+                    var innerMatch = findMatch(innerHex, (innerDirection +3)%6, shapes)
+                    innerHex = innerMatch[0]
+                    innerDirection = innerMatch[1]
+
+                    innerIndex[0] += direction[(i+2)%6][0]
+                    innerIndex[1] += direction[(i+2)%6][1]
+
+                    lables[(innerIndex[0] + "," + innerIndex[1])] = '#' + (innerHex + 1)
+                }
+                across++
+            }
+        }
+
+        context.fillStyle = "#000000";
+        for (let j = -hexSize; j <= hexSize; j++){
+            let start = -hexSize;
+            if (j< 0){
+                start -= j
+            }
+            let end = hexSize
+            if (j>0){
+                end -= j
+            }
+            for (let i = start; i <= end; i++){
+                centerX = (i + j/2) * Math.sqrt(3)*lineLength;
+                centerY = -j *3/2*lineLength;
+
+                context.save();
+                context.translate(centerX, centerY); 
+                context.textBaseline = "center"
+                context.textAlign = "center"
+                const lable = i+","+j
+                context.fillText(lables[lable] ?? lable, 0, 0); // Write text
+                context.restore();
+
+                context.beginPath();
+                context.moveTo(centerX,centerY + lineLength);
+                for (var k = 1; k <= 6; k++)
+                {
+                    if (i == -hexSize && j == hexSize)
+                    {
+                        if (k == 3)
+                        {
+                            continue;
+                        }
+                        if (k==4)
+                        {
+                            context.lineTo(centerX+Math.sin(2 * Math.PI / 6 * 3.5)*lineLength*.9,centerY + Math.cos(2 * Math.PI / 6 * 3.5)*lineLength*.9);
+                            continue;
+                        }
+                    } else if (i == hexSize && j == 0){
+                        if (k == 1){
+                            continue;
+                        }
+                        if (k==2){
+                            context.lineTo(centerX+Math.sin(2 * Math.PI / 6 * 1.5)*lineLength*.9,centerY + Math.cos(2 * Math.PI / 6 * 1.5)*lineLength*.9);
+                            continue;
+                        }
+                    } else if (i == 0 && j == -hexSize){
+                        if (k == 1){
+                            context.moveTo(centerX+Math.sin(2 * Math.PI / 6 * 5.5)*lineLength*.9,centerY + Math.cos(2 * Math.PI / 6 * 5.5)*lineLength*.9);
+                        }
+                        if (k == 5){
+                            continue;
+                        }
+                        if (k==6){
+                            context.lineTo(centerX+Math.sin(2 * Math.PI / 6 * 5.5)*lineLength*.9,centerY + Math.cos(2 * Math.PI / 6 * 5.5)*lineLength*.9);
+                            continue;
+                        }
+                    }
+                    context.lineTo(centerX+Math.sin(2 * Math.PI / 6 * k)*lineLength,centerY + Math.cos(2 * Math.PI / 6 * k)*lineLength);
+                }
+                context.stroke();
+            }
+        }
+
         var imgData = canvas.toDataURL("image/jpeg", 1.0);
         pdf.addImage(imgData, 'JPEG', 0,0);
         pdf.save("Class II Goldberg Polyhedra ("+freq+","+freq+").pdf");
@@ -241,15 +365,41 @@
     function setCanvasSize(size, portrait){
         if (portrait)
         {
-            canvas.width = pageSizes[size][0] * 4/3;
+            canvas.width = pageSizes[size][0] * 4 / 3;
             canvas.height = pageSizes[size][1] * 4 / 3;
         }
         else
         {
-            canvas.height = pageSizes[size][0] * 4/3;
+            canvas.height = pageSizes[size][0] * 4 / 3;
             canvas.width = pageSizes[size][1] * 4 / 3;
         }
         context.fillStyle = "#ffffff";
         context.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function findMatch(shapeIndex, direction, shapes)
+    {
+        const connection = flip(shapes.faces[shapeIndex].connections[direction]) 
+        for (let i = 0; i < shapes.faces.length; i++){
+            for (let j = 0; j < shapes.faces[i].connections.length; j++){
+                if (shapes.faces[i].connections[j] == connection)
+                {
+                    return [i,j]
+                }
+            }
+        }
+    }
+
+    function flip(inString)
+    {
+        if (inString.endsWith("a"))
+        {
+            return inString.replace("a","b")
+        }
+        if (inString.endsWith("b"))
+        {
+            return inString.replace("b","a")
+        }
+        return inString
     }
 </script>
