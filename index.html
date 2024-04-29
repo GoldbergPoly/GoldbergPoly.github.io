@@ -1,0 +1,255 @@
+<html>
+    <head>
+        <title>Class II Goldberg Polyhedra</title>
+    </head>
+    <body style="margin: 0">
+        <canvas style="display:none"></canvas>
+        <div id="form">
+            <fieldset style="display: inline-block">
+                <legend>Frequency</legend>
+                <input type="radio" id="freq1" name="freq" value="1">
+                <label for="freq1">(1,1): <img style="vertical-align: middle; width: 15vw" src="https://upload.wikimedia.org/wikipedia/commons/c/c3/Truncated_icosahedron.png" /></label><br>
+                <input type="radio" id="freq2" name="freq" value="2">
+                <label for="freq2">(2,2): <img style="vertical-align: middle; width: 15vw" src="https://upload.wikimedia.org/wikipedia/commons/e/ea/Conway_polyhedron_dkt5daD.png" /></label><br>
+                <input type="radio" id="freq3" name="freq" value="3" checked>
+                <label for="freq3">(3,3): <img style="vertical-align: middle; width: 15vw" src="https://upload.wikimedia.org/wikipedia/commons/8/80/Conway_polyhedron_dkdktI.png" /></label><br>
+                <input type="radio" id="freq4" name="freq" value="4">
+                <label for="freq4">(4,4): <img style="vertical-align: middle; width: 15vw" src="https://upload.wikimedia.org/wikipedia/commons/d/df/Conway_polyhedron_dadkt5daD.png" /></label><br>
+                <input type="radio" id="freq5" name="freq" value="5">
+                <label for="freq5">(5,5): <img style="vertical-align: middle; width: 15vw" src="https://upload.wikimedia.org/wikipedia/commons/f/fe/Conway_du5zI.png" /></label><br>
+            </fieldset>
+            <div style="display: inline-block">
+                <fieldset>
+                    <legend>Orientation</legend>
+                    <input type="radio" id="portrait" name="orientation" value="p" checked>
+                    <label for="portrait">Portrait</label><br>
+                    <input type="radio" id="landscape" name="orientation" value="l">
+                    <label for="landscape">Landscape</label><br>
+                </fieldset>
+                <fieldset>
+                    <legend>Paper size</legend>
+                    <input type="radio" id="a5" name="page" value="a5">
+                    <label for="a5">a5</label><br>
+                    <input type="radio" id="a4" name="page" value="a4" checked>
+                    <label for="a4">a4</label><br>
+                    <input type="radio" id="a3" name="page" value="a3">
+                    <label for="a3">a3</label><br>
+                    <input type="radio" id="a2" name="page" value="a2">
+                    <label for="a2">a2</label><br>
+                    <input type="radio" id="a1" name="page" value="a1">
+                    <label for="a1">a1</label><br>
+                    <input type="radio" id="a0" name="page" value="a0">
+                    <label for="a0">a0</label><br>
+                </fieldset>
+                <label for="size">Diameter (in M)</label>
+                <input type="number" id="size" name="size" value=1><br />
+                <input type="button" id="generateButton" name="button" value="Generate" onClick="return generate()">
+            </div>
+
+        </div>
+    </body>
+</html>
+
+<script id ="pdfScript" src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
+
+<script>
+
+    var canvas = document.getElementsByTagName("canvas")[0];  
+    var context = canvas.getContext("2d");
+    const polyhedra = {"1":{"edgeLengths":[0.4120226591665965],"angles":[120.0,108.0],"faces":[{"edges":[0,0,0,0,0,0],"angles":[0,0,0,0,0,0],"quantity":20,"connections":["1b","2","1b","2","1b","2"]},{"edges":[0,0,0,0,0],"angles":[1,1,1,1,1],"quantity":12,"connections":["1a","1a","1a","1a","1a"]}]},"2":{"edgeLengths":[0.21018570157305355,0.2080985155781759,0.19284356784865003,0.1796758061140017],"angles":[120.0,119.66876789814134,120.66246420371732,118.11327702492032,117.09476047686138,124.7919624982183,108.0],"faces":[{"edges":[0,0,0,0,0,0],"angles":[0,0,0,0,0,0],"quantity":20,"connections":["3b","6a","3b","6a","3b","6a"]},{"edges":[1,1,0,1,1,0],"angles":[1,2,1,1,2,1],"quantity":30,"connections":["2b","4b","6b","2b","4b","7"]},{"edges":[3,2,1,0,1,2],"angles":[5,5,3,4,4,3],"quantity":60,"connections":["1b","5b","2a","3a","4a","5a"]},{"edges":[3,3,3,3,3],"angles":[6,6,6,6,6],"quantity":12,"connections":["1a","1a","1a","1a","1a"]}]},"3":{"edgeLengths":[0.11047981263427244,0.14074515577374755,0.13610509916273866,0.130980127353853,0.13927299119523393,0.13982791293804925,0.13963531228811696,0.11957026955942601,0.13329952822312643],"angles":[108.00000000000001,120.0,118.73031271408689,120.78108371940331,122.5086332241371,118.46857390888248,120.04523456093922,120.30295317536047,119.6518122637003,118.13262646965799,125.53912477397176,116.32824875637024,121.57480397954777,119.54064613044159,118.8845498900106],"faces":[{"edges":[0,0,0,0,0],"angles":[0,0,0,0,0],"quantity":12,"connections":["1a","1a","1a","1a","1a"]},{"edges":[1,1,1,1,1,1],"angles":[1,1,1,1,1,1],"quantity":20,"connections":["7b","13a","7b","13a","7b","13a"]},{"edges":[3,3,2,4,4,2],"angles":[3,4,3,2,5,2],"quantity":60,"connections":["2b","4b","9b","10a","11a","12a"]},{"edges":[4,5,1,5,4,6],"angles":[6,7,8,8,7,6],"quantity":60,"connections":["10b","8b","13b","6b","11b","14"]},{"edges":[0,7,3,8,3,7],"angles":[10,10,9,11,11,9],"quantity":60,"connections":["1b","5b","2a","3a","4a","5a"]},{"edges":[8,2,5,1,5,2],"angles":[12,12,13,14,14,13],"quantity":60,"connections":["3b","12b","6a","7a","8a","9a"]}]},"4":{"edgeLengths":[0.07822891920798136,0.10570167313026776,0.10459426658924396,0.10492442068698016,0.10527732877522451,0.10488870255358074,0.10115129998606494,0.09792765786450325,0.09341478284692145,0.10293224508520375,0.1038926147526925,0.09531276419534052,0.1017373983094349,0.08487286035324178,0.10301208046498586],"angles":[108.0,120.0,119.89563791157578,120.20872417684845,120.14466037991662,119.74442992957572,120.1109096905077,117.83635092160797,118.44446971724122,121.10067442322253,123.07336079746449,120.74363648319405,119.82893045205239,119.42743306475354,122.14443108893985,119.51674214627391,118.33882676478623,118.15208508829704,125.76828402033021,116.0796308913728,119.49270302873438,120.69774182039258,121.28891799882776,120.13182369626199,119.21143936327636,119.17737409250694],"faces":[{"edges":[0,0,0,0,0],"angles":[0,0,0,0,0],"quantity":12,"connections":["1a","1a","1a","1a","1a"]},{"edges":[1,1,1,1,1,1],"angles":[1,1,1,1,1,1],"quantity":20,"connections":["14b","23a","14b","23a","14b","23a"]},{"edges":[2,2,3,2,2,3],"angles":[2,3,2,2,3,2],"quantity":30,"connections":["20b","18b","24b","20b","18b","25"]},{"edges":[5,4,1,4,5,3],"angles":[6,4,5,5,4,6],"quantity":60,"connections":["17b","15b","23b","13b","21b","24a"]},{"edges":[8,8,7,6,6,7],"angles":[9,10,9,8,7,8],"quantity":60,"connections":["2b","4b","9b","10a","11a","12a"]},{"edges":[9,10,4,1,4,10],"angles":[11,11,12,13,13,12],"quantity":60,"connections":["7b","22b","13a","14a","15a","16a"]},{"edges":[11,7,12,9,12,7],"angles":[14,14,15,16,16,15],"quantity":60,"connections":["3b","12b","6a","7a","8a","9a"]},{"edges":[0,13,8,11,8,13],"angles":[18,18,17,19,19,17],"quantity":60,"connections":["1b","5b","2a","3a","4a","5a"]},{"edges":[6,12,10,5,2,14],"angles":[21,22,23,24,25,20],"quantity":60,"connections":["10b","8b","16b","17a","18a","19a"]},{"edges":[12,6,14,2,5,10],"angles":[23,22,21,20,25,24],"quantity":60,"connections":["6b","11b","19b","20a","21a","22a"]}]},"5":{"edgeLengths":[0.059850818111249385,0.08460965821545127,0.08411145960847813,0.08388010611107154,0.08374609381802471,0.08384343502238446,0.08305354153582731,0.08196896600055273,0.08438656056319785,0.08413746125971125,0.08329681168453004,0.08373013729773728,0.07988218896799112,0.08097296050384707,0.08268027186211653,0.07821240345425588,0.07542733853493928,0.07168511885906197,0.07322190654623144,0.07875747974581909,0.06499957464157088,0.08226103124884633,0.0801358189639903],"angles":[108.00000000000007,120.0,119.85593105458649,120.12966728275694,120.01440166265655,119.44934192541791,119.56525977603468,120.27703592251214,120.86606667748845,120.0772890746479,119.81478185121668,120.10792907413541,120.42943862591149,119.9167459340442,119.65381544004427,121.13506560852106,119.80457682923245,119.06035756224651,117.5744194253014,118.32460952991875,121.2330379936474,123.31028552756624,119.5201441130342,122.3937326470526,118.08612323991315,118.16173055062515,125.86421062201163,115.97405882736328,120.495836116155,120.73237029323937,119.99507398081704,119.48013053861514,119.5109539036537,119.7856351675197,119.32047392365169,120.9821129707018,121.70741286098644,120.30476133809773,118.96299340395578,118.72224550260654],"faces":[{"edges":[0,0,0,0,0],"angles":[0,0,0,0,0],"quantity":12,"connections":["1a","1a","1a","1a","1a"]},{"edges":[1,1,1,1,1,1],"angles":[1,1,1,1,1,1],"quantity":20,"connections":["24b","36a","24b","36a","24b","36a"]},{"edges":[4,3,2,3,4,5],"angles":[4,3,2,2,3,4],"quantity":60,"connections":["30b","28b","37b","33b","31b","38"]},{"edges":[7,7,6,4,4,6],"angles":[7,8,7,6,5,6],"quantity":60,"connections":["20b","18b","29b","30a","31a","32a"]},{"edges":[9,8,1,8,9,2],"angles":[11,9,10,10,9,11],"quantity":60,"connections":["27b","25b","36b","23b","34b","37a"]},{"edges":[10,11,8,1,8,11],"angles":[12,12,13,14,14,13],"quantity":60,"connections":["14b","35b","23a","24a","25a","26a"]},{"edges":[12,13,14,10,14,13],"angles":[15,15,16,17,17,16],"quantity":60,"connections":["7b","22b","13a","14a","15a","16a"]},{"edges":[17,17,16,15,15,16],"angles":[20,21,20,19,18,19],"quantity":60,"connections":["2b","4b","9b","10a","11a","12a"]},{"edges":[18,16,19,12,19,16],"angles":[23,23,22,24,24,22],"quantity":60,"connections":["3b","12b","6a","7a","8a","9a"]},{"edges":[0,20,17,18,17,20],"angles":[26,26,25,27,27,25],"quantity":60,"connections":["1b","5b","2a","3a","4a","5a"]},{"edges":[21,14,11,9,3,6],"angles":[28,29,30,31,32,33],"quantity":60,"connections":["17b","15b","26b","27a","28a","29a"]},{"edges":[14,21,6,3,9,11],"angles":[30,29,28,33,32,31],"quantity":60,"connections":["13b","21b","32b","33a","34a","35a"]},{"edges":[15,19,13,21,7,22],"angles":[35,36,37,38,39,34],"quantity":60,"connections":["10b","8b","16b","17a","18a","19a"]},{"edges":[19,15,22,7,21,13],"angles":[37,36,35,34,39,38],"quantity":60,"connections":["6b","11b","19b","20a","21a","22a"]}]}};
+    const pageSizes = {
+        'a0': [2383.94, 3370.39], 'a1': [1683.78, 2383.94],
+        'a2': [1190.55, 1683.78], 'a3': [841.89, 1190.55],
+        'a4': [595.28, 841.89], 'a5': [419.53, 595.28]
+    }
+
+    function generate() {
+        let inputs = {};
+        document.getElementById("generateButton").disabled = true;
+        const inputDoms = document.getElementsByTagName("input");
+
+        for (let i = 0; i < inputDoms.length; i++) {
+            if (inputDoms[i].type == "radio" && !inputDoms[i].checked) {
+                continue;
+            }
+            inputs[inputDoms[i].name] = inputDoms[i].value
+        }
+
+        run(inputs["page"], inputs["size"], inputs["orientation"], inputs["freq"])
+
+        window.setTimeout(function () {
+            document.getElementById("generateButton").disabled = false;
+        }, 2000);   
+    }
+
+    function run(pageSize, Diameter, orientation, freq ) {
+        const border = 20;
+        const spacer = 100;
+
+        setCanvasSize(pageSize, orientation == 'p');
+        var pdf = new jspdf.jsPDF({
+            orientation: orientation,
+            unit: 'pt',
+            format: pageSize,
+        });
+
+        var shapes = polyhedra[freq];
+
+        var lastY = -spacer;
+        var lastX = 0;
+
+        for (let i = 0; i < shapes.faces.length; i++) {
+
+            const edgeLengths = shapes.faces[i].edges.map((index) => shapes.edgeLengths[index]).map((side) => side * Diameter * 500 *  480 / 127);
+            const interiorAngles = shapes.faces[i].angles.map((index) => shapes.angles[index]);
+            const text = shapes.faces[i].connections;
+
+            let vertices = calculateVertices(edgeLengths, interiorAngles);
+            vertices = shift(vertices, [border, lastY + spacer]);
+
+            let maxY = Math.max(...vertices.map((v) => v[1]));
+
+            if (maxY + border> canvas.height && i > 0) {
+                var imgData = canvas.toDataURL("image/jpeg", 1.0);
+                pdf.addImage(imgData, 'JPEG', (canvas.width - lastX) * 3 / 8, (canvas.height - lastY) * 3 / 8);
+                pdf.addPage()
+
+                context.fillStyle = "#ffffff";
+                context.fillRect(0, 0, canvas.width, canvas.height);
+
+                vertices = shift(vertices, [border, border]);
+                maxY = Math.max(...vertices.map((v) => v[1]));
+                lastX = 0;
+            }
+
+            let minX = Math.min(...vertices.map((v) => v[0]));
+            let maxX = Math.max(...vertices.map((v) => v[0]));
+            let minY = Math.min(...vertices.map((v) => v[1]));
+            lastY = maxY
+            lastX = Math.max(lastX, maxX);
+
+            context.beginPath();
+            context.moveTo(vertices[vertices.length - 1][0], vertices[vertices.length - 1][1]);
+
+            vertices.forEach(vertex => {
+                context.lineTo(vertex[0], vertex[1]);
+            });
+
+            context.lineWidth = 1;
+            context.strokeStyle = '#000000';
+            context.stroke();
+
+            context.fillStyle = "#000000"; 
+            context.textAlign = "center"; 
+            context.textBaseline = "center";
+            context.fillText("#" + (i+1) + " x " + shapes.faces[i].quantity, (minX + maxX) / 2, (minY + maxY) / 2); // Write text
+
+            context.textBaseline = "top";
+
+            for (let j = 0; j < vertices.length; j++) {
+                const nextIndex = (j + 1) % vertices.length; 
+                const midX = (vertices[j][0] + vertices[nextIndex][0]) / 2; 
+                const midY = (vertices[j][1] + vertices[nextIndex][1]) / 2; 
+
+                const dx = vertices[nextIndex][0] - vertices[j][0];
+                const dy = vertices[nextIndex][1] - vertices[j][1];
+                let angle = Math.atan2(dy, dx);
+
+                if (angle < 0) {
+                    angle += 2 * Math.PI;
+                }
+
+                context.save();
+                context.translate(midX, midY); 
+                context.rotate(angle); 
+                context.fillText(text[j], 0, 5); 
+                context.restore(); 
+            }
+        }
+
+        var imgData = canvas.toDataURL("image/jpeg", 1.0);
+        pdf.addImage(imgData, 'JPEG', (canvas.width - lastX) * 3 / 8, (canvas.height - lastY) * 3 / 8);
+        pdf.addPage()
+
+        context.textBaseline = "top"
+        context.textAlign = "left"
+        context.fillStyle = "#ffffff";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        let textHeight = border
+        const lineHeight = (context.measureText("").fontBoundingBoxDescent + context.measureText("").fontBoundingBoxAscent) * 1.2;
+        context.fillStyle = "#000000";
+
+        context.fillText("Faces", border, textHeight); 
+        textHeight += lineHeight;
+
+        for (var i = 0; i < shapes.faces.length; i++){
+            context.fillText("   #" + (i + 1) + " x " + shapes.faces[i].quantity, border, textHeight); 
+            textHeight += lineHeight;
+        }
+
+        context.fillText("   total:" + shapes.faces.reduce((n, {quantity}) => n + quantity, 0), border, textHeight); 
+        textHeight += 2 * lineHeight;
+        
+        context.fillText("Edges", border, textHeight); 
+        textHeight += lineHeight;
+        
+        for (var i = 0; i < shapes.edgeLengths.length; i++){
+            let edgeText = "   " + (i+1) + "(" + Math.round(shapes.edgeLengths[i] * Diameter * 500 * 100)/100 + "mm): "
+            let cons = [];
+            shapes.faces.forEach((face) => {
+                for (var j = 0; j < face.edges.length ; j++){
+                    if (face.edges[j] == i){
+                        cons.push(face.connections[j].replace('a','').replace('b',''))
+                    }
+                }
+            })
+
+            cons = cons.sort(function(a, b){return parseInt(a) - parseInt(b)})
+            cons = cons.filter((v,i) => cons.indexOf(v) == i)
+            edgeText += cons.join(', ')                 
+            context.fillText(edgeText, border, textHeight); 
+            textHeight += lineHeight;
+        }
+
+        var imgData = canvas.toDataURL("image/jpeg", 1.0);
+        pdf.addImage(imgData, 'JPEG', 0,0);
+        pdf.save("Class II Goldberg Polyhedra ("+freq+","+freq+").pdf");
+    }
+
+    function shift(points, start){
+        return points.map(point => [point[0] + start[0] - points.reduce((last, next) => last[0] < next[0] ? last : next)[0], point[1] + start[1] - points.reduce((last, next) => last[1] < next[1] ? last : next)[1]])
+    }
+
+    function calculateVertices(edgeLengths, interiorAngles) {
+        const vertices = [];
+
+        let x = 0;
+        let y = 0;
+        let angle = 0;
+
+        for (let i = 0; i < edgeLengths.length; i++) {
+            x += edgeLengths[i] * Math.cos(angle);
+            y += edgeLengths[i] * Math.sin(angle);
+
+            vertices.push([x, y]);
+            angle += Math.PI - (interiorAngles[i + 1] * Math.PI / 180);
+        }
+
+        return vertices;
+    }
+
+    function setCanvasSize(size, portrait){
+        if (portrait)
+        {
+            canvas.width = pageSizes[size][0] * 4/3;
+            canvas.height = pageSizes[size][1] * 4 / 3;
+        }
+        else
+        {
+            canvas.height = pageSizes[size][0] * 4/3;
+            canvas.width = pageSizes[size][1] * 4 / 3;
+        }
+        context.fillStyle = "#ffffff";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+    }
+</script>
