@@ -179,22 +179,27 @@
         const lineHeight = (context.measureText("").fontBoundingBoxDescent + context.measureText("").fontBoundingBoxAscent) * 1.2;
         context.fillStyle = "#000000";
 
-        context.fillText("Faces", border, textHeight); 
+        context.fillText("Total size: " + Diameter + "m", border, textHeight);
+        textHeight += 2 * lineHeight;
+
+        context.fillText("Faces", border, textHeight);
         textHeight += lineHeight;
 
         for (var i = 0; i < shapes.faces.length; i++){
-            context.fillText("   #" + (i + 1) + " x " + shapes.faces[i].quantity, border, textHeight); 
+            context.fillText("#" + (i + 1) + " x " + shapes.faces[i].quantity, 2 * border, textHeight); 
             textHeight += lineHeight;
         }
 
-        context.fillText("   total:" + shapes.faces.reduce((n, {quantity}) => n + quantity, 0), border, textHeight); 
+        context.fillText("total: " + shapes.faces.reduce((n, {quantity}) => n + quantity, 0), 2 * border, textHeight); 
         textHeight += 2 * lineHeight;
         
         context.fillText("Edges", border, textHeight); 
         textHeight += lineHeight;
-        
+
+        var printEdges = [] 
+
         for (var i = 0; i < shapes.edgeLengths.length; i++){
-            let edgeText = "   " + (i+1) + "(" + Math.round(shapes.edgeLengths[i] * Diameter * 500 * 100)/100 + "mm): "
+            let edgeText = Math.round(shapes.edgeLengths[i] * Diameter * 500 * 100)/100 + "mm: "
             let cons = [];
             shapes.faces.forEach((face) => {
                 for (var j = 0; j < face.edges.length ; j++){
@@ -206,8 +211,13 @@
 
             cons = cons.sort(function(a, b){return parseInt(a) - parseInt(b)})
             cons = cons.filter((v,i) => cons.indexOf(v) == i)
-            edgeText += cons.join(', ')                 
-            context.fillText(edgeText, border, textHeight); 
+            edgeText += cons.join(', ')
+            printEdges.push([shapes.edgeLengths[i], edgeText])
+        }
+
+        printEdges = printEdges.sort(function (a, b) { return a[0] - b[0]})
+        for (var i = 0; i < printEdges.length; i++) {
+            context.fillText(printEdges[i][1], 2 * border, textHeight);
             textHeight += lineHeight;
         }
 
